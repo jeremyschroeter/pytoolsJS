@@ -48,6 +48,7 @@ class AnnotationVolume:
     def __init__(self) -> None:
         self.av = self._load_av()
         self.tree = SimpleStructureTree()
+        self._shape = self.av.shape
 
 
     def _load_av(self):
@@ -56,16 +57,15 @@ class AnnotationVolume:
         av_path = os.path.join(assets_path, 'annotation_10.nrrd')
         return nrrd.read(av_path)[0]
 
-    def get_region_voxels(self, id, lowest: bool = True) -> np.ndarray:
+    def get_region_voxels(self, id) -> np.ndarray:
         if isinstance(id, str):
             id = self.tree.name_map[id]
-        if lowest is False:
-            return np.array(np.where(np.isin(self.av, id))).T
-        test_nodes = self.tree.collect_children(id)
-        test_nodes.append(id)
-        return np.array(np.where(np.isin(self.av, test_nodes))).T
+        return np.array(np.where(np.isin(self.av, id))).T
     
     def __getitem__(self, index):
         return self.av[index]
 
+    @property
+    def shape(self):
+        return self._shape
 
